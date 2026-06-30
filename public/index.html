@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Suivi Mission Collaborateur</title>
+<style>
+  /* ============ DA « Bleu Citron » — Tokens ============ */
+  :root {
+    --apple-blue: #1450E2;
+    --apple-blue-hover: #1038B0;
+    --apple-bg: #f5f5f7;
+    --apple-card: #ffffff;
+    --apple-text: #1d1d1f;
+    --apple-text-secondary: #86868b;
+    --apple-separator: #d2d2d7;
+    --apple-green: #34c759;
+    --apple-orange: #ff9500;
+    --apple-red: #ff3b30;
+    --apple-indigo: #5856d6;
+    --apple-purple: #af52de;
+    --apple-teal: #5ac8fa;
+
+    --radius: 0.75rem;
+    --radius-sm: 0.5rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.25rem;
+    --radius-2xl: 1rem;
+    --radius-full: 9999px;
+
+    --spacing-xs: 4px; --spacing-sm: 8px; --spacing-md: 16px;
+    --spacing-lg: 24px; --spacing-xl: 32px; --spacing-2xl: 48px; --spacing-3xl: 64px;
+
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+    --shadow-glass: 0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.06),
+                    inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -0.5px 0 rgba(0,0,0,0.03);
+    --shadow-glass-hover: 0 2px 6px rgba(0,0,0,0.06), 0 12px 40px rgba(0,0,0,0.08),
+                          inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -0.5px 0 rgba(0,0,0,0.03);
+    --shadow-navbar: 0 2px 20px rgba(0,0,0,0.08);
+
+    --duration-fast: 150ms;
+    --duration-normal: 200ms;
+    --duration-slow: 300ms;
+    --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+                 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    line-height: 1.47059;
+    letter-spacing: -0.022em;
+    color: var(--apple-text);
+    background-color: var(--apple-bg);
+    background-image:
+      radial-gradient(ellipse 120% 80% at 15% 10%, rgba(90, 200, 250, 0.06), transparent 50%),
+      radial-gradient(ellipse 100% 70% at 85% 30%, rgba(0, 113, 227, 0.04), transparent 50%),
+      radial-gradient(ellipse 90% 60% at 50% 90%, rgba(88, 86, 214, 0.03), transparent 50%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #c1c1c6; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #a1a1a6; }
+  ::selection { background: rgba(20,80,226,0.2); color: var(--apple-blue); }
+
+  /* ============ Glass surfaces ============ */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.38);
+    backdrop-filter: blur(50px) saturate(200%);
+    -webkit-backdrop-filter: blur(50px) saturate(200%);
+    border: 0.5px solid rgba(255, 255, 255, 0.55);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-glass);
+  }
+
+  /* ============ Boutons ============ */
+  .btn {
+    font-size: 13px; font-weight: 600;
+    border-radius: var(--radius-full);
+    border: none; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 0 18px; height: 40px;
+    transition: background var(--duration-fast) var(--ease),
+                transform var(--duration-fast) var(--ease),
+                box-shadow var(--duration-fast) var(--ease);
+    white-space: nowrap;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(20,80,226,0.3), 0 0 0 4px #fff; }
+
+  .btn-primary { background: var(--apple-blue); color: #fff; box-shadow: var(--shadow-sm); }
+  .btn-primary:hover { background: var(--apple-blue-hover); }
+
+  .btn-secondary { background: rgba(120,120,128,0.12); color: var(--apple-text); }
+  .btn-secondary:hover { background: rgba(120,120,128,0.2); }
+
+  .btn-outline { background: #fff; color: var(--apple-text); border: 1px solid var(--apple-separator); }
+  .btn-outline:hover { background: #fafafa; }
+
+  .btn-ghost { background: transparent; color: var(--apple-text-secondary); border-radius: var(--radius); }
+  .btn-ghost:hover { background: rgba(120,120,128,0.12); }
+
+  .btn-sm { height: 36px; padding: 0 14px; }
+
+  .glass-pill {
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 0.5px solid rgba(255, 255, 255, 0.50);
+    border-radius: var(--radius-full);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05), inset 0 0.5px 0 rgba(255,255,255,0.6);
+    color: var(--apple-text);
+  }
+  .glass-pill:hover { box-shadow: var(--shadow-glass-hover); }
+
+  /* ============ Layout ============ */
+  .wrap { max-width: 1100px; margin: 0 auto; padding: var(--spacing-lg); }
+
+  /* ============ Header ============ */
+  header.navbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    box-shadow: var(--shadow-navbar);
+  }
+  .navbar-inner {
+    max-width: 1100px; margin: 0 auto;
+    padding: var(--spacing-md) var(--spacing-lg);
+    display: flex; align-items: center; gap: var(--spacing-md);
+    flex-wrap: wrap;
+  }
+  .brand { font-size: 19px; font-weight: 700; letter-spacing: -0.03em; display: flex; align-items: center; gap: 8px; }
+  .brand .dot { color: var(--apple-blue); }
+  .spacer { flex: 1; }
+  .updated { font-size: 12px; color: var(--apple-text-secondary); }
+
+  .user-chip { display: flex; align-items: center; gap: 8px; }
+  .user-chip img, .user-chip .avatar { width: 32px; height: 32px; border-radius: var(--radius-full); }
+  .user-chip .name { font-size: 13px; font-weight: 600; }
+
+  /* ============ Stats ============ */
+  .stats { display: flex; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); flex-wrap: wrap; }
+  .stat { flex: 1; min-width: 160px; padding: var(--spacing-lg); }
+  .stat .num { font-size: 34px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
+  .stat .lbl { font-size: 13px; color: var(--apple-text-secondary); margin-top: 6px; }
+  .stat.t1 .num { color: var(--apple-red); }
+  .stat.t2 .num { color: var(--apple-orange); }
+
+  /* ============ Sections ============ */
+  .section { margin-bottom: var(--spacing-2xl); }
+  .section-head { display: flex; align-items: center; gap: 10px; margin-bottom: var(--spacing-md); padding: 0 4px; }
+  .section-head .marker { width: 4px; height: 22px; border-radius: var(--radius-full); }
+  .section.t1 .marker { background: var(--apple-red); }
+  .section.t2 .marker { background: var(--apple-orange); }
+  .section-head h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+  .section-head .sub { font-size: 13px; color: var(--apple-text-secondary); }
+  .section-head .count {
+    margin-left: auto; font-size: 13px; font-weight: 600;
+    padding: 2px 12px; border-radius: var(--radius-full);
+    background: rgba(120,120,128,0.12); color: var(--apple-text-secondary);
+  }
+
+  /* ============ Cartes contact ============ */
+  .cards { display: flex; flex-direction: column; gap: var(--spacing-md); }
+  .card { padding: var(--spacing-md) var(--spacing-lg); cursor: pointer; animation: fade-in 0.4s var(--ease) both;
+          transition: box-shadow var(--duration-normal) var(--ease), transform var(--duration-normal) var(--ease); }
+  .card:hover { box-shadow: var(--shadow-glass-hover); }
+  .card-row { display: flex; align-items: center; gap: var(--spacing-md); }
+
+  .avatar {
+    width: 44px; height: 44px; border-radius: var(--radius-full);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 600; font-size: 15px; flex-shrink: 0;
+  }
+  .card-main { flex: 1; min-width: 0; }
+  .card-main .name { font-size: 15px; font-weight: 600; }
+  .card-main .email { font-size: 13px; color: var(--apple-text-secondary); }
+  .card-main .subject { font-size: 13px; color: var(--apple-text); margin-top: 2px;
+                        overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .card-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+  .card-meta .date { font-size: 12px; color: var(--apple-text-secondary); }
+  .chevron { transition: transform var(--duration-normal) var(--ease); color: var(--apple-text-secondary); }
+  .card.open .chevron { transform: rotate(180deg); }
+
+  /* Badge urgence */
+  .badge {
+    font-size: 11px; font-weight: 600; padding: 3px 10px;
+    border-radius: var(--radius-sm); display: inline-flex; align-items: center; gap: 4px;
+  }
+  .badge.high { background: rgba(255,59,48,0.12); color: var(--apple-red); }
+  .badge.medium { background: rgba(255,149,0,0.14); color: #b35e00; }
+  .badge.normal { background: rgba(120,120,128,0.12); color: var(--apple-text-secondary); }
+
+  /* Déplié */
+  .card-expand { display: none; margin-top: var(--spacing-md); padding-top: var(--spacing-md);
+                 border-top: 0.5px solid var(--apple-separator); }
+  .card.open .card-expand { display: grid; grid-template-columns: 1fr 1.3fr; gap: var(--spacing-lg);
+                            animation: drop-in 0.15s var(--ease) both; }
+  .panel-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+                 color: var(--apple-text-secondary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .task-text { font-size: 14px; color: var(--apple-text); }
+
+  textarea {
+    width: 100%; min-height: 150px; resize: vertical;
+    font-family: inherit; font-size: 14px; line-height: 1.5; color: var(--apple-text);
+    background: var(--apple-bg); border: 1px solid var(--apple-separator);
+    border-radius: var(--radius-xl); padding: 12px 14px;
+    transition: box-shadow var(--duration-fast) var(--ease), border-color var(--duration-fast) var(--ease);
+  }
+  textarea:focus-visible { outline: none; border-color: var(--apple-blue);
+                           box-shadow: 0 0 0 3px rgba(20,80,226,0.15); }
+  .panel-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+
+  /* ============ Empty state ============ */
+  .empty { text-align: center; padding: var(--spacing-2xl) var(--spacing-lg); color: var(--apple-text-secondary); }
+  .empty .big { font-size: 30px; margin-bottom: 8px; }
+
+  /* ============ Login ============ */
+  .login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: var(--spacing-lg); }
+  .login-card { max-width: 420px; width: 100%; padding: var(--spacing-2xl); text-align: center; }
+  .login-card .icon { font-size: 48px; margin-bottom: var(--spacing-md); animation: pulse-scale 2s ease-in-out infinite; }
+  .login-card h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 8px; }
+  .login-card p { color: var(--apple-text-secondary); font-size: 14px; margin-bottom: var(--spacing-xl); }
+  .google-btn { width: 100%; justify-content: center; height: 48px; font-size: 15px; }
+  .google-btn svg { width: 18px; height: 18px; }
+  .auth-error { color: var(--apple-red); font-size: 13px; margin-top: var(--spacing-md); }
+
+  /* ============ Loading overlay ============ */
+  .overlay {
+    position: fixed; inset: 0; z-index: 100; display: none;
+    align-items: center; justify-content: center; padding: var(--spacing-lg);
+    background: rgba(245,245,247,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .overlay.show { display: flex; }
+  .loader-card { max-width: 380px; width: 100%; padding: var(--spacing-2xl); text-align: center; }
+  .loader-card h3 { font-size: 17px; font-weight: 700; margin-bottom: var(--spacing-md); }
+  .progress { height: 6px; background: rgba(120,120,128,0.15); border-radius: var(--radius-full); overflow: hidden; margin: var(--spacing-md) 0; }
+  .progress-bar { height: 100%; width: 0%; background: var(--apple-blue); border-radius: var(--radius-full);
+                  transition: width var(--duration-slow) var(--ease); }
+  .loader-step { font-size: 13px; color: var(--apple-text-secondary); min-height: 20px; }
+
+  /* ============ Toast ============ */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: rgba(55, 60, 72, 0.92); backdrop-filter: blur(40px) saturate(180%);
+    color: #fff; font-size: 14px; font-weight: 500;
+    padding: 12px 20px; border-radius: var(--radius-full); box-shadow: var(--shadow-lg);
+    opacity: 0; pointer-events: none; transition: all var(--duration-normal) var(--ease); z-index: 200;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ============ Keyframes ============ */
+  @keyframes fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes drop-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse-scale {
+    0%,100% { transform: scale(1); text-shadow: 0 0 6px rgba(20,80,226,.5), 0 0 16px rgba(20,80,226,.25); filter: brightness(1); }
+    50% { transform: scale(1.08); text-shadow: 0 0 14px rgba(20,80,226,.8), 0 0 36px rgba(20,80,226,.5), 0 0 60px rgba(20,80,226,.2); filter: brightness(1.3); }
+  }
+
+  /* ============ Responsive ============ */
+  @media (max-width: 720px) {
+    .card.open .card-expand { grid-template-columns: 1fr; }
+    .stat { min-width: 100%; }
+    .updated { display: none; }
+    .user-chip .name { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="login" class="login-screen" style="display:none;">
+  <div class="glass-card login-card">
+    <div class="icon">📋</div>
+    <h1>Suivi Mission Collaborateur</h1>
+    <p>Détection automatique des actions en attente dans votre boîte mail. Connectez-vous avec votre compte Google professionnel.</p>
+    <a href="/auth/google" class="btn btn-primary google-btn">
+      <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M44.5 20H24v8.5h11.8C34.7 33.9 30 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 6 1.1 8.2 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z" opacity=".0"/><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.4 29.2 35 24 35c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.3 5.1 29.4 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.2-.1-2.5-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.3 5.1 29.4 3 24 3 16 3 9.1 7.6 6.3 14.7z"/><path fill="#4CAF50" d="M24 45c5.3 0 10.1-2 13.7-5.3l-6.3-5.3C29.3 35.9 26.8 37 24 37c-5.2 0-9.6-3.3-11.2-7.9l-6.5 5C9.1 40.4 16 45 24 45z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4 5.4l6.3 5.3C41.9 35.6 45 30.3 45 24c0-1.2-.1-2.5-.4-3.5z"/></svg>
+      Se connecter avec Google
+    </a>
+    <div id="authError" class="auth-error" style="display:none;"></div>
+  </div>
+</div>
+
+<!-- ===================== DASHBOARD ===================== -->
+<div id="dashboard" style="display:none;">
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="brand"><span class="dot">📋</span> Suivi Mission <span style="color:var(--apple-text-secondary);font-weight:600">Collaborateur</span></div>
+      <div class="spacer"></div>
+      <span id="updated" class="updated"></span>
+      <button id="refreshBtn" class="btn btn-primary btn-sm">↻ Actualiser</button>
+      <div class="user-chip">
+        <span id="userAvatar"></span>
+        <span id="userName" class="name"></span>
+      </div>
+      <a href="/auth/logout" class="btn btn-ghost btn-sm">Déconnexion</a>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="stats">
+      <div class="glass-card stat"><div id="statTotal" class="num">—</div><div class="lbl">Total à relancer</div></div>
+      <div class="glass-card stat t1"><div id="statT1" class="num">—</div><div class="lbl">Tunnel 1 · En attente stricte</div></div>
+      <div class="glass-card stat t2"><div id="statT2" class="num">—</div><div class="lbl">Tunnel 2 · Tâche non finalisée</div></div>
+    </div>
+
+    <section class="section t1">
+      <div class="section-head">
+        <span class="marker"></span>
+        <div><h2>Tunnel 1 — En attente stricte</h2><div class="sub">E-mails envoyés sans aucune réponse</div></div>
+        <span id="countT1" class="count">0</span>
+      </div>
+      <div id="cardsT1" class="cards"></div>
+    </section>
+
+    <section class="section t2">
+      <div class="section-head">
+        <span class="marker"></span>
+        <div><h2>Tunnel 2 — Analyse sémantique</h2><div class="sub">Réponse reçue, mais une action reste en attente</div></div>
+        <span id="countT2" class="count">0</span>
+      </div>
+      <div id="cardsT2" class="cards"></div>
+    </section>
+  </div>
+</div>
+
+<!-- ===================== OVERLAY ===================== -->
+<div id="overlay" class="overlay">
+  <div class="glass-card loader-card">
+    <h3>Analyse de votre boîte mail…</h3>
+    <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
+    <div id="loaderStep" class="loader-step">Connexion à Gmail…</div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+'use strict';
+
+const AVATAR_COLORS = ['#1450E2','#AF52DE','#0891B2','#FF9500','#5856D6','#F43F5E','#10B981','#EAB308','#14B8A6'];
+
+function hashColor(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+function initials(name) {
+  const parts = (name || '?').trim().split(/\s+/);
+  return ((parts[0]||'')[0] || '' ).toUpperCase() + ((parts[1]||'')[0] || '').toUpperCase();
+}
+function urgencyBadge(u) {
+  const map = { high: '🔴 Urgent', medium: '🟠 À suivre', normal: '⚪ Normal' };
+  return `<span class="badge ${u}">${map[u] || map.normal}</span>`;
+}
+function esc(s) { return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+let dataCache = null;
+
+// ---- Init : vérifie l'état d'authentification ----
+async function init() {
+  const params = new URLSearchParams(location.search);
+  const authErr = params.get('auth_error');
+
+  try {
+    const res = await fetch('/api/me');
+    if (res.status === 401) return showLogin(authErr);
+    const { user } = await res.json();
+    showDashboard(user);
+    refresh(false);
+  } catch (e) {
+    showLogin(authErr);
+  }
+}
+
+function showLogin(err) {
+  document.getElementById('login').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+  if (err) {
+    const el = document.getElementById('authError');
+    el.style.display = 'block';
+    el.textContent = 'Échec de la connexion (' + err + '). Réessayez.';
+  }
+}
+
+function showDashboard(user) {
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('userName').textContent = user.name || user.email;
+  const av = document.getElementById('userAvatar');
+  if (user.picture) {
+    av.innerHTML = `<img src="${esc(user.picture)}" alt="" referrerpolicy="no-referrer"/>`;
+  } else {
+    av.innerHTML = `<span class="avatar" style="width:32px;height:32px;font-size:13px;background:${hashColor(user.name||user.email)}">${initials(user.name||user.email)}</span>`;
+  }
+}
+
+// ---- Loading overlay avec étapes simulées ----
+let stepTimer = null;
+function startLoader() {
+  const steps = [
+    'Connexion à Gmail…',
+    'Récupération des fils de discussion…',
+    'Analyse sémantique des conversations (Claude)…',
+    'Génération des relances…',
+    'Finalisation…'
+  ];
+  const overlay = document.getElementById('overlay');
+  const bar = document.getElementById('progressBar');
+  const stepEl = document.getElementById('loaderStep');
+  overlay.classList.add('show');
+  let i = 0;
+  bar.style.width = '8%';
+  stepEl.textContent = steps[0];
+  stepTimer = setInterval(() => {
+    i = Math.min(i + 1, steps.length - 1);
+    stepEl.textContent = steps[i];
+    bar.style.width = (15 + i * 18) + '%';
+  }, 1200);
+}
+function stopLoader() {
+  clearInterval(stepTimer);
+  const bar = document.getElementById('progressBar');
+  bar.style.width = '100%';
+  setTimeout(() => document.getElementById('overlay').classList.remove('show'), 250);
+}
+
+// ---- Refresh ----
+async function refresh(force) {
+  startLoader();
+  try {
+    const res = await fetch('/api/refresh' + (force ? '?force=true' : ''));
+    if (res.status === 401) { stopLoader(); return showLogin('session_expired'); }
+    if (!res.ok) throw new Error('refresh failed');
+    const data = await res.json();
+    dataCache = data;
+    render(data);
+  } catch (e) {
+    toast('⚠ Échec de l\'analyse. Réessayez.');
+  } finally {
+    stopLoader();
+  }
+}
+
+function render(data) {
+  const t1 = data.tunnel1 || [], t2 = data.tunnel2 || [];
+  document.getElementById('statTotal').textContent = t1.length + t2.length;
+  document.getElementById('statT1').textContent = t1.length;
+  document.getElementById('statT2').textContent = t2.length;
+  document.getElementById('countT1').textContent = t1.length;
+  document.getElementById('countT2').textContent = t2.length;
+
+  if (data.updatedAt) {
+    const d = new Date(data.updatedAt);
+    document.getElementById('updated').textContent =
+      'Maj ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  renderCards('cardsT1', t1, 'Tunnel 1');
+  renderCards('cardsT2', t2, 'Tunnel 2');
+}
+
+function renderCards(containerId, items, label) {
+  const c = document.getElementById(containerId);
+  if (!items.length) {
+    c.innerHTML = `<div class="empty"><div class="big">✅</div>Aucun élément en attente pour ${label}.</div>`;
+    return;
+  }
+  c.innerHTML = items.map((it, idx) => cardHTML(it, containerId + '-' + idx)).join('');
+}
+
+function cardHTML(it, id) {
+  return `
+  <div class="glass-card card" data-id="${id}" onclick="toggleCard(this, event)">
+    <div class="card-row">
+      <span class="avatar" style="background:${hashColor(it.name)}">${initials(it.name)}</span>
+      <div class="card-main">
+        <div class="name">${esc(it.name)}</div>
+        <div class="email">${esc(it.email)}</div>
+        <div class="subject">${esc(it.subject)}</div>
+      </div>
+      <div class="card-meta">
+        ${urgencyBadge(it.urgency)}
+        <span class="date">${esc(it.date)}</span>
+        <span class="chevron">▾</span>
+      </div>
+    </div>
+    <div class="card-expand">
+      <div>
+        <div class="panel-label">⚠ Tâche en attente</div>
+        <div class="task-text">${esc(it.task)}</div>
+      </div>
+      <div>
+        <div class="panel-label">✉ Proposition de relance</div>
+        <textarea data-relance onclick="event.stopPropagation()">${esc(it.relance)}</textarea>
+        <div class="panel-actions">
+          <button class="btn btn-secondary btn-sm" onclick="copyRelance(this, event)">📋 Copier</button>
+          <button class="btn btn-primary btn-sm" onclick="createDraft(this, event, '${esc(it.email)}', '${esc(it.subject).replace(/'/g, "\\'")}')">✉ Créer brouillon</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleCard(el, ev) {
+  el.classList.toggle('open');
+}
+
+function copyRelance(btn, ev) {
+  ev.stopPropagation();
+  const ta = btn.closest('.card-expand').querySelector('[data-relance]');
+  navigator.clipboard.writeText(ta.value).then(() => toast('📋 Relance copiée'));
+}
+
+async function createDraft(btn, ev, to, subject) {
+  ev.stopPropagation();
+  const ta = btn.closest('.card-expand').querySelector('[data-relance]');
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = '…';
+  try {
+    const res = await fetch('/api/draft', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to, subject: 'Re: ' + subject, body: ta.value }),
+    });
+    if (!res.ok) throw new Error();
+    toast('✓ Brouillon créé dans Gmail !');
+    btn.textContent = '✓ Créé';
+    setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2500);
+  } catch (e) {
+    toast('⚠ Échec de la création du brouillon');
+    btn.textContent = original;
+    btn.disabled = false;
+  }
+}
+
+let toastTimer = null;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+document.getElementById('refreshBtn').addEventListener('click', () => refresh(true));
+init();
+</script>
+</body>
+</html>

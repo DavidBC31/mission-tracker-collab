@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Service launchd : lance le tunnel Cloudflare.
+  À ADAPTER : le chemin de cloudflared (ex: /opt/homebrew/bin/cloudflared)
+  et le nom du tunnel si différent.
+  Puis : cp dans ~/Library/LaunchAgents/ et `launchctl load`.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.suivi-mission.cloudflared</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/cloudflared</string>
+        <string>tunnel</string>
+        <string>run</string>
+        <string>suivi-mission</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/suivi-mission.cloudflared.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/suivi-mission.cloudflared.err.log</string>
+</dict>
+</plist>

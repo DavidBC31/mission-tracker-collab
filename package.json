@@ -1,0 +1,24 @@
+{
+  "name": "suivi-mission-collab",
+  "version": "1.0.0",
+  "description": "Tableau de bord d'analyse d'e-mails — détection des actions en attente (Tunnel 1 & 2) avec relances IA. Multi-utilisateurs via Google SSO.",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "cookie-session": "^2.1.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "googleapis": "^144.0.0"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}

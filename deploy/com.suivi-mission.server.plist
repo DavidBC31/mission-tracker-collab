@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Service launchd : lance le serveur Node.
+  À ADAPTER avant usage :
+    - WORKING_DIR  : chemin absolu du projet
+    - le chemin de node (ex: /opt/homebrew/bin/node ou /usr/local/bin/node)
+  Puis : cp dans ~/Library/LaunchAgents/ et `launchctl load`.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.suivi-mission.server</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/node</string>
+        <string>server.js</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/VOTRE_USER/chemin/vers/suivi-mission</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>NODE_ENV</key>
+        <string>production</string>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/suivi-mission.server.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/suivi-mission.server.err.log</string>
+</dict>
+</plist>
