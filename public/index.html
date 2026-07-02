@@ -154,70 +154,94 @@
   .stat.t1 .num { color: var(--apple-red); }
   .stat.t2 .num { color: var(--apple-orange); }
 
+  /* ============ Tunnels côte à côte ============ */
+  .tunnels { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); align-items: start; }
+
   /* ============ Sections ============ */
-  .section { margin-bottom: var(--spacing-2xl); }
-  .section-head { display: flex; align-items: center; gap: 10px; margin-bottom: var(--spacing-md); padding: 0 4px; }
-  .section-head .marker { width: 4px; height: 22px; border-radius: var(--radius-full); }
+  .section { margin-bottom: var(--spacing-lg); min-width: 0; }
+  .section-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 0 4px; }
+  .section-head .marker { width: 4px; height: 18px; border-radius: var(--radius-full); flex-shrink: 0; }
   .section.t1 .marker { background: var(--apple-red); }
   .section.t2 .marker { background: var(--apple-orange); }
-  .section-head h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
-  .section-head .sub { font-size: 13px; color: var(--apple-text-secondary); }
+  .section-head h2 { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; }
+  .section-head .sub { font-size: 12px; color: var(--apple-text-secondary); }
   .section-head .count {
-    margin-left: auto; font-size: 13px; font-weight: 600;
-    padding: 2px 12px; border-radius: var(--radius-full);
+    margin-left: auto; font-size: 12px; font-weight: 600;
+    padding: 1px 10px; border-radius: var(--radius-full);
     background: rgba(120,120,128,0.12); color: var(--apple-text-secondary);
   }
 
-  /* ============ Cartes contact ============ */
-  .cards { display: flex; flex-direction: column; gap: var(--spacing-md); }
-  .card { padding: var(--spacing-md) var(--spacing-lg); cursor: pointer; animation: fade-in 0.4s var(--ease) both;
-          transition: box-shadow var(--duration-normal) var(--ease), transform var(--duration-normal) var(--ease); }
+  /* ============ Cartes contact (compactes) ============ */
+  .cards { display: flex; flex-direction: column; gap: 8px; }
+  .card { padding: 10px 12px; cursor: pointer; animation: fade-in 0.3s var(--ease) both;
+          transition: box-shadow var(--duration-normal) var(--ease); }
   .card:hover { box-shadow: var(--shadow-glass-hover); }
-  .card-row { display: flex; align-items: center; gap: var(--spacing-md); }
+  .card-row { display: flex; align-items: center; gap: 10px; }
 
   .avatar {
-    width: 44px; height: 44px; border-radius: var(--radius-full);
+    width: 34px; height: 34px; border-radius: var(--radius-full);
     display: flex; align-items: center; justify-content: center;
-    color: #fff; font-weight: 600; font-size: 15px; flex-shrink: 0;
+    color: #fff; font-weight: 600; font-size: 13px; flex-shrink: 0;
   }
   .card-main { flex: 1; min-width: 0; }
-  .card-main .name { font-size: 15px; font-weight: 600; }
-  .card-main .email { font-size: 13px; color: var(--apple-text-secondary); }
-  .card-main .subject { font-size: 13px; color: var(--apple-text); margin-top: 2px;
+  .card-main .line1 { display: flex; align-items: baseline; gap: 6px; }
+  .card-main .name { font-size: 13.5px; font-weight: 600; white-space: nowrap;
+                     overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
+  .card-main .date { font-size: 11px; color: var(--apple-text-secondary); margin-left: auto; flex-shrink: 0; }
+  .card-main .subject { font-size: 12.5px; color: var(--apple-text-secondary); margin-top: 1px;
                         overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .card-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
-  .card-meta .date { font-size: 12px; color: var(--apple-text-secondary); }
-  .chevron { transition: transform var(--duration-normal) var(--ease); color: var(--apple-text-secondary); }
+
+  /* Pastille d'urgence compacte */
+  .urg-dot { width: 9px; height: 9px; border-radius: var(--radius-full); flex-shrink: 0; }
+  .urg-dot.high { background: var(--apple-red); box-shadow: 0 0 0 3px rgba(255,59,48,0.15); }
+  .urg-dot.medium { background: var(--apple-orange); }
+  .urg-dot.normal { background: var(--apple-separator); }
+  .chevron { font-size: 11px; transition: transform var(--duration-normal) var(--ease);
+             color: var(--apple-text-secondary); flex-shrink: 0; }
   .card.open .chevron { transform: rotate(180deg); }
 
-  /* Badge urgence */
+  /* Badge urgence (texte, dans le déplié) */
   .badge {
-    font-size: 11px; font-weight: 600; padding: 3px 10px;
+    font-size: 11px; font-weight: 600; padding: 2px 9px;
     border-radius: var(--radius-sm); display: inline-flex; align-items: center; gap: 4px;
   }
   .badge.high { background: rgba(255,59,48,0.12); color: var(--apple-red); }
   .badge.medium { background: rgba(255,149,0,0.14); color: #b35e00; }
   .badge.normal { background: rgba(120,120,128,0.12); color: var(--apple-text-secondary); }
 
-  /* Déplié */
-  .card-expand { display: none; margin-top: var(--spacing-md); padding-top: var(--spacing-md);
-                 border-top: 0.5px solid var(--apple-separator); }
-  .card.open .card-expand { display: grid; grid-template-columns: 1fr 1.3fr; gap: var(--spacing-lg);
+  /* ============ Déplié (empilé, vertical) ============ */
+  .card-expand { display: none; }
+  .card.open .card-expand { display: block; margin-top: 10px; padding-top: 10px;
+                            border-top: 0.5px solid var(--apple-separator);
                             animation: drop-in 0.15s var(--ease) both; }
-  .panel-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
-                 color: var(--apple-text-secondary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-  .task-text { font-size: 14px; color: var(--apple-text); }
+  .expand-block { margin-bottom: 12px; }
+  .expand-block:last-child { margin-bottom: 0; }
+  .panel-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+                 color: var(--apple-text-secondary); margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+  .subject-full { font-size: 13.5px; font-weight: 600; color: var(--apple-text); }
+  .meta-line { font-size: 12px; color: var(--apple-text-secondary); margin-top: 2px; }
+  .task-text { font-size: 13px; color: var(--apple-text); }
+
+  /* En savoir plus → corps du mail */
+  .more-btn { font-size: 12px; font-weight: 600; color: var(--apple-blue); background: none;
+              border: none; cursor: pointer; padding: 4px 0; display: inline-flex; align-items: center; gap: 4px; }
+  .more-btn:hover { text-decoration: underline; }
+  .mail-body { margin-top: 8px; font-size: 12.5px; line-height: 1.55; color: var(--apple-text);
+               white-space: pre-wrap; word-break: break-word; max-height: 260px; overflow-y: auto;
+               background: var(--apple-bg); border: 0.5px solid var(--apple-separator);
+               border-radius: var(--radius); padding: 10px 12px; }
+  .mail-body.empty-body { color: var(--apple-text-secondary); font-style: italic; }
 
   textarea {
-    width: 100%; min-height: 150px; resize: vertical;
-    font-family: inherit; font-size: 14px; line-height: 1.5; color: var(--apple-text);
+    width: 100%; min-height: 128px; resize: vertical;
+    font-family: inherit; font-size: 13px; line-height: 1.5; color: var(--apple-text);
     background: var(--apple-bg); border: 1px solid var(--apple-separator);
-    border-radius: var(--radius-xl); padding: 12px 14px;
+    border-radius: var(--radius-xl); padding: 10px 12px;
     transition: box-shadow var(--duration-fast) var(--ease), border-color var(--duration-fast) var(--ease);
   }
   textarea:focus-visible { outline: none; border-color: var(--apple-blue);
                            box-shadow: 0 0 0 3px rgba(20,80,226,0.15); }
-  .panel-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .panel-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
 
   /* ============ Empty state ============ */
   .empty { text-align: center; padding: var(--spacing-2xl) var(--spacing-lg); color: var(--apple-text-secondary); }
@@ -266,8 +290,10 @@
   }
 
   /* ============ Responsive ============ */
+  @media (max-width: 900px) {
+    .tunnels { grid-template-columns: 1fr; }
+  }
   @media (max-width: 720px) {
-    .card.open .card-expand { grid-template-columns: 1fr; }
     .stat { min-width: 100%; }
     .updated { display: none; }
     .user-chip .name { display: none; }
@@ -313,23 +339,25 @@
       <div class="glass-card stat t2"><div id="statT2" class="num">—</div><div class="lbl">Tunnel 2 · Tâche non finalisée</div></div>
     </div>
 
-    <section class="section t1">
-      <div class="section-head">
-        <span class="marker"></span>
-        <div><h2>Tunnel 1 — En attente stricte</h2><div class="sub">E-mails envoyés sans aucune réponse</div></div>
-        <span id="countT1" class="count">0</span>
-      </div>
-      <div id="cardsT1" class="cards"></div>
-    </section>
+    <div class="tunnels">
+      <section class="section t1">
+        <div class="section-head">
+          <span class="marker"></span>
+          <div><h2>Tunnel 1 — En attente stricte</h2><div class="sub">Envoyés sans aucune réponse</div></div>
+          <span id="countT1" class="count">0</span>
+        </div>
+        <div id="cardsT1" class="cards"></div>
+      </section>
 
-    <section class="section t2">
-      <div class="section-head">
-        <span class="marker"></span>
-        <div><h2>Tunnel 2 — Analyse sémantique</h2><div class="sub">Réponse reçue, mais une action reste en attente</div></div>
-        <span id="countT2" class="count">0</span>
-      </div>
-      <div id="cardsT2" class="cards"></div>
-    </section>
+      <section class="section t2">
+        <div class="section-head">
+          <span class="marker"></span>
+          <div><h2>Tunnel 2 — Analyse sémantique</h2><div class="sub">Réponse reçue, action en attente</div></div>
+          <span id="countT2" class="count">0</span>
+        </div>
+        <div id="cardsT2" class="cards"></div>
+      </section>
+    </div>
   </div>
 </div>
 
@@ -357,6 +385,9 @@ function hashColor(str) {
 function initials(name) {
   const parts = (name || '?').trim().split(/\s+/);
   return ((parts[0]||'')[0] || '' ).toUpperCase() + ((parts[1]||'')[0] || '').toUpperCase();
+}
+function urgencyLabel(u) {
+  return ({ high: 'Urgent', medium: 'À suivre', normal: 'Normal' })[u] || 'Normal';
 }
 function urgencyBadge(u) {
   const map = { high: '🔴 Urgent', medium: '🟠 À suivre', normal: '⚪ Normal' };
@@ -479,28 +510,40 @@ function renderCards(containerId, items, label) {
 }
 
 function cardHTML(it, id) {
+  const body = (it.body || '').trim();
+  const bodyHTML = body
+    ? `<div class="mail-body" hidden>${esc(body)}</div>`
+    : `<div class="mail-body empty-body" hidden>(Corps du message indisponible)</div>`;
   return `
   <div class="glass-card card" data-id="${id}" onclick="toggleCard(this, event)">
     <div class="card-row">
       <span class="avatar" style="background:${hashColor(it.name)}">${initials(it.name)}</span>
       <div class="card-main">
-        <div class="name">${esc(it.name)}</div>
-        <div class="email">${esc(it.email)}</div>
+        <div class="line1">
+          <span class="name">${esc(it.name)}</span>
+          <span class="urg-dot ${it.urgency}" title="${esc(urgencyLabel(it.urgency))}"></span>
+          <span class="date">${esc(it.date)}</span>
+        </div>
         <div class="subject">${esc(it.subject)}</div>
       </div>
-      <div class="card-meta">
-        ${urgencyBadge(it.urgency)}
-        <span class="date">${esc(it.date)}</span>
-        <span class="chevron">▾</span>
-      </div>
+      <span class="chevron">▾</span>
     </div>
     <div class="card-expand">
-      <div>
+      <div class="expand-block">
+        <div class="panel-label">✉ Objet ${urgencyBadge(it.urgency)}</div>
+        <div class="subject-full">${esc(it.subject)}</div>
+        <div class="meta-line">${esc(it.email)} · ${esc(it.date)}</div>
+      </div>
+      <div class="expand-block">
         <div class="panel-label">⚠ Tâche en attente</div>
         <div class="task-text">${esc(it.task)}</div>
       </div>
-      <div>
-        <div class="panel-label">✉ Proposition de relance</div>
+      <div class="expand-block">
+        <button class="more-btn" onclick="toggleBody(this, event)">En savoir plus <span class="tri">▾</span></button>
+        ${bodyHTML}
+      </div>
+      <div class="expand-block">
+        <div class="panel-label">✏️ Proposition de relance</div>
         <textarea data-relance onclick="event.stopPropagation()">${esc(it.relance)}</textarea>
         <div class="panel-actions">
           <button class="btn btn-secondary btn-sm" onclick="copyRelance(this, event)">📋 Copier</button>
@@ -513,6 +556,14 @@ function cardHTML(it, id) {
 
 function toggleCard(el, ev) {
   el.classList.toggle('open');
+}
+
+function toggleBody(btn, ev) {
+  ev.stopPropagation();
+  const body = btn.parentElement.querySelector('.mail-body');
+  const open = body.hasAttribute('hidden');
+  if (open) { body.removeAttribute('hidden'); btn.innerHTML = 'Réduire <span class="tri" style="display:inline-block;transform:rotate(180deg)">▾</span>'; }
+  else { body.setAttribute('hidden', ''); btn.innerHTML = 'En savoir plus <span class="tri">▾</span>'; }
 }
 
 function copyRelance(btn, ev) {

@@ -66,11 +66,14 @@ Réponds UNIQUEMENT avec un JSON valide, sans texte autour :
 }
 
 async function generateRelance({ contactName, subject, taskDescription, userName }) {
-  const prompt = `Écris un e-mail de relance professionnel court (3-5 lignes) en français, signé "${userName}".
+  const prompt = `Rédige un e-mail de relance en français, court (3-4 lignes), signé "${userName}".
+Ton : cordial, direct et humain — comme un message entre collègues qui se connaissent.
+Tutoie le contact (emploie "tu"). Évite le style corporate, rigide ou trop formel :
+pas de "Je me permets de revenir vers vous", pas de formules ampoulées. Va à l'essentiel avec le sourire.
 Contact : ${contactName}
 Sujet original : ${subject}
 Contexte : ${taskDescription}
-Réponds uniquement avec le texte de l'email.`;
+Réponds uniquement avec le texte de l'email (sans objet, sans commentaire).`;
 
   const res = await anthropic.messages.create({
     model: MODEL,
@@ -163,6 +166,7 @@ async function analyzeMailbox(gmail, user) {
         task,
         urgency: urgencyFromDays(days),
         relance,
+        body: lastMsg.body || '',
       });
     } else {
       // --- Tunnel 2 : réponse reçue → analyse sémantique ---
@@ -208,6 +212,7 @@ async function analyzeMailbox(gmail, user) {
         task,
         urgency,
         relance,
+        body: lastMsg.body || '',
       });
     }
   }
