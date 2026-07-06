@@ -47,6 +47,8 @@ cp .env.example .env
 GOOGLE_CLIENT_ID=...apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=...
 GOOGLE_REDIRECT_URI=http://localhost:3000/auth/callback   # ou l'URL de prod
+ALLOWED_GOOGLE_DOMAIN=bleucitron.net   # SSO restreint à ce domaine (vide = ouvert)
+DIGEST_HOUR=8                          # heure (Paris) du récap quotidien par e-mail
 ```
 
 ---

@@ -5,6 +5,7 @@ const { google } = require('googleapis');
 const crypto = require('crypto');
 
 const config = require('../config');
+const store = require('../services/store');
 
 const router = express.Router();
 
@@ -27,6 +28,8 @@ router.get('/google', (req, res) => {
     prompt: 'consent', // force le refresh_token même après 1ère autorisation
     scope: config.google.scopes,
     state,
+    // Pré-filtre Google sur le domaine de l'entreprise (revérifié au callback)
+    hd: config.google.allowedDomain || undefined,
   });
 
   res.redirect(url);
@@ -53,12 +56,33 @@ router.get('/callback', async (req, res) => {
     const oauth2api = google.oauth2({ version: 'v2', auth: oauth2 });
     const { data: profile } = await oauth2api.userinfo.get();
 
+    // Restriction au domaine de l'entreprise (le paramètre hd de l'URL
+    // OAuth n'est qu'indicatif — la vérification serveur fait foi)
+    const domain = (profile.email || '').split('@')[1] || '';
+    if (
+      config.google.allowedDomain &&
+      domain.toLowerCase() !== config.google.allowedDomain
+    ) {
+      return res.redirect('/?auth_error=domain');
+    }
+
     req.session.tokens = tokens;
     req.session.user = {
       name: profile.name || profile.email,
       email: profile.email,
       picture: profile.picture || null,
     };
+
+    // Enrôlement pour le digest matinal : profil + tokens chiffrés sur disque
+    try {
+      const rec = store.load(profile.email);
+      rec.name = profile.name || profile.email;
+      rec.picture = profile.picture || null;
+      store.save(profile.email, rec);
+      store.saveTokens(profile.email, tokens);
+    } catch (err) {
+      console.warn('[auth] enrôlement store échoué :', err.message);
+    }
 
     res.redirect('/');
   } catch (err) {

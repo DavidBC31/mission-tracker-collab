@@ -7,11 +7,23 @@ dans la boîte mail Gmail de l'utilisateur connecté.
 - **Tunnel 2 — Tâche non finalisée** : réponse reçue, mais une action reste en attente
   (analyse sémantique par Claude) → relance contextuelle.
 
-Pour chaque détection : contact, objet, date, résumé de la tâche, urgence (HIGH > 14j,
-MEDIUM > 7j, NORMAL), et un e-mail de relance pré-rédigé éditable → brouillon Gmail en 1 clic.
+Pour chaque détection : contact, objet, jours sans réponse, résumé de la tâche, urgence,
+corps du mail, et une relance pré-rédigée (registre tu/vous détecté automatiquement) —
+reformulable en 1 clic, envoyable directement ou en brouillon Gmail.
+
+Fonctionnalités clés :
+- **Fiabilité** : classification Claude des deux tunnels sur le corps des fils, filtres
+  anti-bruit (noreply, newsletters, invitations calendrier)
+- **Statuts** : traité / ignoré / reporté 7 j — un fil classé ne revient plus (sauf nouveau message)
+- **Digest matinal** : récap quotidien des relances par e-mail (opt-out 🔔)
+- **Rapide** : cache d'analyse par fil (fils inchangés = zéro appel IA), analyse parallélisée,
+  résultats affichés au fil de l'eau (SSE) sans bloquer l'écran
+- **Sécurisé** : SSO restreint au domaine de l'entreprise, tokens chiffrés
+- **UI** : recherche, filtre urgents, tri par priorité, dark mode, accessible au clavier
 
 Multi-utilisateurs : chaque personne se connecte avec son propre compte Google et ne voit
-que ses propres e-mails. Aucune donnée n'est partagée ni stockée en base.
+que ses propres e-mails. Pas de base de données : un fichier JSON par utilisateur dans `data/`
+(tokens chiffrés AES-256-GCM, statuts, cache d'analyse).
 
 ## Stack
 Node.js · Express · Google OAuth 2.0 SSO · Gmail API · Claude API (`claude-haiku-4-5-20251001`) ·

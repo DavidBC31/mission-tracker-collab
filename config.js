@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 require('dotenv').config();
 
 function required(name) {
@@ -18,6 +19,10 @@ const config = {
     clientId: required('GOOGLE_CLIENT_ID'),
     clientSecret: required('GOOGLE_CLIENT_SECRET'),
     redirectUri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/callback',
+    // Restriction SSO au domaine de l'entreprise ('' = ouvert à tous)
+    allowedDomain: (process.env.ALLOWED_GOOGLE_DOMAIN !== undefined
+      ? process.env.ALLOWED_GOOGLE_DOMAIN
+      : 'bleucitron.net').trim().toLowerCase(),
     scopes: [
       'https://www.googleapis.com/auth/gmail.readonly',
       'https://www.googleapis.com/auth/gmail.compose',
@@ -42,7 +47,28 @@ const config = {
     URGENCY_HIGH_DAYS: 14,
     URGENCY_MED_DAYS: 7,
     CACHE_TTL_MS: 5 * 60 * 1000, // 5 minutes par utilisateur
+    CONCURRENCY: 4, // fils analysés en parallèle (Gmail + Claude)
   },
+
+  digest: {
+    hour: parseInt(process.env.DIGEST_HOUR || '8', 10),
+    timeZone: 'Europe/Paris',
+  },
+
+  app: {
+    url: process.env.APP_URL || '',
+  },
+
+  dataDir: path.join(__dirname, 'data'),
 };
+
+// URL publique par défaut : déduite du redirect URI OAuth
+if (!config.app.url) {
+  try {
+    config.app.url = new URL(config.google.redirectUri).origin;
+  } catch (_) {
+    config.app.url = `http://localhost:${config.port}`;
+  }
+}
 
 module.exports = config;

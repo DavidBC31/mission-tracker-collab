@@ -3,10 +3,12 @@
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
+const MemoryStore = require('memorystore')(session);
 
 const config = require('./config');
 const authRoutes = require('./routes/auth');
 const apiRoutes = require('./routes/api');
+const digest = require('./services/digest');
 
 const app = express();
 
@@ -20,6 +22,7 @@ app.use(
   session({
     name: 'sm.sid',
     secret: config.session.secret,
+    store: new MemoryStore({ checkPeriod: 24 * 60 * 60 * 1000 }),
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -53,5 +56,9 @@ app.use((err, req, res, next) => {
 app.listen(config.port, () => {
   console.log(`\n📋 Suivi Mission Collaborateur`);
   console.log(`   ➜ http://localhost:${config.port}`);
-  console.log(`   Mode : ${config.isProd ? 'production' : 'development'}\n`);
+  console.log(`   Mode : ${config.isProd ? 'production' : 'development'}`);
+  if (config.google.allowedDomain) {
+    console.log(`   SSO restreint à : @${config.google.allowedDomain}\n`);
+  }
+  digest.start();
 });

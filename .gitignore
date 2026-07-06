@@ -6,6 +6,9 @@ node_modules/
 .env.local
 *.local
 
+# Données utilisateurs (tokens chiffrés, caches, statuts)
+data/
+
 # Logs
 *.log
 npm-debug.log*
