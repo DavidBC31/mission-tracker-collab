@@ -68,6 +68,22 @@ async function runAnalysis(req, hooks = {}) {
   return payload;
 }
 
+// Contexte de réponse : en-têtes RFC du fil pour que l'envoi (ou le brouillon)
+// apparaisse dans la même conversation, chez l'utilisateur comme chez le contact
+async function replyContext(gmail, threadId) {
+  try {
+    const meta = await gmailSvc.getThreadMeta(gmail, threadId);
+    const ids = meta.messages.map((m) => m.messageId).filter(Boolean);
+    return {
+      threadId,
+      inReplyTo: ids[ids.length - 1] || undefined,
+      references: ids.join(' ') || undefined,
+    };
+  } catch (_) {
+    return { threadId }; // au pire : rattaché côté Gmail seulement
+  }
+}
+
 // Retire un élément du payload en cache (statut changé / envoyé)
 function dropFromCache(email, threadId) {
   const c = payloadCache.get(email);
@@ -253,7 +269,8 @@ router.post('/send', requireAuth, async (req, res) => {
 
   try {
     const gmail = gmailForRequest(req);
-    const messageId = await gmailSvc.sendMessage(gmail, { to, subject, body });
+    const reply = threadId ? await replyContext(gmail, threadId) : {};
+    const messageId = await gmailSvc.sendMessage(gmail, { to, subject, body, ...reply });
 
     if (threadId) {
       const rec = store.load(user.email);
@@ -272,16 +289,17 @@ router.post('/send', requireAuth, async (req, res) => {
   }
 });
 
-// POST /api/draft → crée un brouillon Gmail
+// POST /api/draft → crée un brouillon Gmail (dans le fil si threadId fourni)
 router.post('/draft', requireAuth, async (req, res) => {
-  const { to, subject, body } = req.body || {};
+  const { threadId, to, subject, body } = req.body || {};
   if (!to || !subject || !body) {
     return res.status(400).json({ error: 'Champs to, subject et body requis' });
   }
 
   try {
     const gmail = gmailForRequest(req);
-    const draftId = await gmailSvc.createDraft(gmail, { to, subject, body });
+    const reply = threadId ? await replyContext(gmail, threadId) : {};
+    const draftId = await gmailSvc.createDraft(gmail, { to, subject, body, ...reply });
     res.json({ success: true, draftId });
   } catch (err) {
     console.error('[api] /draft échec :', err.message);

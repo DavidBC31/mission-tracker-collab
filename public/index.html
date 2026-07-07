@@ -875,7 +875,7 @@ async function handleAction(btn) {
   if (action === 'draft') {
     btn.disabled = true;
     try {
-      await api('/api/draft', { to: it.email, subject: 'Re: ' + it.subject, body: ta.value });
+      await api('/api/draft', { threadId: it.threadId, to: it.email, subject: 'Re: ' + it.subject, body: ta.value });
       toast('✓ Brouillon créé dans Gmail !');
     } catch (err) {
       toast('⚠ Échec de la création du brouillon');

@@ -140,6 +140,7 @@ function normalizeMessage(m, withBody) {
     to: decodeHeader(headers, 'To'),
     subject: decodeHeader(headers, 'Subject'),
     date: decodeHeader(headers, 'Date'),
+    messageId: decodeHeader(headers, 'Message-ID'), // en-tête RFC, pour le threading des réponses
     listUnsubscribe: decodeHeader(headers, 'List-Unsubscribe'),
     internalDate: parseInt(m.internalDate || '0', 10),
     snippet: m.snippet || '',
@@ -155,7 +156,7 @@ async function getThreadMeta(gmail, threadId) {
     userId: 'me',
     id: threadId,
     format: 'metadata',
-    metadataHeaders: ['From', 'To', 'Subject', 'Date', 'List-Unsubscribe'],
+    metadataHeaders: ['From', 'To', 'Subject', 'Date', 'Message-ID', 'List-Unsubscribe'],
   });
   const messages = (res.data.messages || []).map((m) => normalizeMessage(m, false));
   const subject = (messages[0] && messages[0].subject) || '(sans objet)';
@@ -177,16 +178,19 @@ async function getThread(gmail, threadId) {
   return { id: threadId, subject, messages };
 }
 
-// Construit un message MIME encodé base64url
-function buildRaw({ to, subject, body, html }) {
-  const lines = [
-    `To: ${to}`,
-    `Subject: ${encodeRFC2047(subject)}`,
+// Construit un message MIME encodé base64url.
+// inReplyTo / references (en-têtes RFC Message-ID) permettent au destinataire
+// de voir la réponse dans le même fil de conversation.
+function buildRaw({ to, subject, body, html, inReplyTo, references }) {
+  const lines = [`To: ${to}`, `Subject: ${encodeRFC2047(subject)}`];
+  if (inReplyTo) lines.push(`In-Reply-To: ${inReplyTo}`);
+  if (references) lines.push(`References: ${references}`);
+  lines.push(
     `Content-Type: ${html ? 'text/html' : 'text/plain'}; charset="UTF-8"`,
     'MIME-Version: 1.0',
     '',
-    body,
-  ];
+    body
+  );
   return Buffer.from(lines.join('\r\n'), 'utf-8')
     .toString('base64')
     .replace(/\+/g, '-')
@@ -194,20 +198,24 @@ function buildRaw({ to, subject, body, html }) {
     .replace(/=+$/, '');
 }
 
-/** Crée un brouillon dans le Gmail de l'utilisateur connecté. */
-async function createDraft(gmail, { to, subject, body }) {
+/** Crée un brouillon, rattaché au fil d'origine si threadId est fourni. */
+async function createDraft(gmail, { to, subject, body, threadId, inReplyTo, references }) {
+  const message = { raw: buildRaw({ to, subject, body, inReplyTo, references }) };
+  if (threadId) message.threadId = threadId;
   const res = await gmail.users.drafts.create({
     userId: 'me',
-    requestBody: { message: { raw: buildRaw({ to, subject, body }) } },
+    requestBody: { message },
   });
   return res.data.id;
 }
 
-/** Envoie directement un e-mail (scope gmail.compose le permet). */
-async function sendMessage(gmail, { to, subject, body, html }) {
+/** Envoie un e-mail, dans le fil d'origine si threadId est fourni. */
+async function sendMessage(gmail, { to, subject, body, html, threadId, inReplyTo, references }) {
+  const requestBody = { raw: buildRaw({ to, subject, body, html, inReplyTo, references }) };
+  if (threadId) requestBody.threadId = threadId;
   const res = await gmail.users.messages.send({
     userId: 'me',
-    requestBody: { raw: buildRaw({ to, subject, body, html }) },
+    requestBody,
   });
   return res.data.id;
 }
