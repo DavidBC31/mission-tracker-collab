@@ -53,4 +53,5 @@ Tunnel 1 = rouge Apple #FF3B30, Tunnel 2 = orange Apple #FF9500. Dark mode via p
 - `services/analyze.js` — classification 2 tunnels + tu/vous, cache par fil, pool, relances
 - `services/store.js` — persistance JSON par utilisateur (tokens chiffrés, statuts, cache)
 - `services/digest.js` — récap matinal planifié
-- `public/index.html` — dashboard SPA self-contained (SSE, filtres, statuts, dark mode, a11y)
+- `public/index.html` — dashboard SPA self-contained (SSE, filtres, statuts, dark mode, a11y,
+  FAQ intégrée via la modale « ? » — à tenir à jour si les règles métier changent)

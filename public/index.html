@@ -355,6 +355,46 @@
   .google-btn svg { width: 18px; height: 18px; }
   .auth-error { color: var(--apple-red); font-size: 13px; margin-top: var(--spacing-md); }
 
+  /* ============ Aide / FAQ ============ */
+  .icon-btn.help { width: 32px; height: 32px; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+  .login-help {
+    margin-top: var(--spacing-md); background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 600; color: var(--apple-text-secondary);
+  }
+  .login-help:hover { color: var(--apple-blue); text-decoration: underline; }
+
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 150; display: none;
+    align-items: flex-start; justify-content: center;
+    padding: 6vh 16px 16px; overflow-y: auto;
+    background: rgba(0,0,0,0.28);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+  .modal-overlay.show { display: flex; }
+  .modal { max-width: 620px; width: 100%; padding: var(--spacing-xl); position: relative;
+           animation: drop-in 0.2s var(--ease) both;
+           background: var(--apple-card); }
+  .modal h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; padding-right: 40px; }
+  .modal .modal-sub { font-size: 13px; color: var(--apple-text-secondary); margin-bottom: var(--spacing-md); }
+  .modal-close { position: absolute; top: 18px; right: 18px; }
+
+  .faq details { border-bottom: 0.5px solid var(--apple-separator); }
+  .faq details:last-child { border-bottom: none; }
+  .faq summary {
+    cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px;
+    font-size: 13.5px; font-weight: 600; color: var(--apple-text); padding: 12px 0;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after {
+    content: '▾'; margin-left: auto; font-size: 11px; color: var(--apple-text-secondary);
+    transition: transform var(--duration-normal) var(--ease);
+  }
+  .faq details[open] summary::after { transform: rotate(180deg); }
+  .faq .a { font-size: 13px; line-height: 1.55; color: var(--apple-text-secondary); padding: 0 0 14px; }
+  .faq .a strong { color: var(--apple-text); font-weight: 600; }
+  .faq .a .t1c { color: var(--apple-red); font-weight: 600; }
+  .faq .a .t2c { color: var(--apple-orange); font-weight: 600; }
+
   /* ============ Toast ============ */
   .toast {
     position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
@@ -399,6 +439,7 @@
       Se connecter avec Google
     </a>
     <div id="authError" class="auth-error" style="display:none;"></div>
+    <button id="helpBtnLogin" class="login-help" aria-haspopup="dialog">Comment ça marche ?</button>
   </div>
 </div>
 
@@ -410,6 +451,7 @@
       <span id="banner" class="banner" hidden><span class="spin" aria-hidden="true"></span><span id="bannerText">Analyse…</span></span>
       <div class="spacer"></div>
       <span id="updated" class="updated"></span>
+      <button id="helpBtn" class="icon-btn help" title="Comment ça marche ?" aria-label="Comment ça marche ?" aria-haspopup="dialog">?</button>
       <button id="refreshBtn" class="btn btn-primary btn-sm">↻ Actualiser</button>
       <div class="user-chip">
         <span id="userAvatar"></span>
@@ -457,6 +499,55 @@
         <h3>Tout est à jour !</h3>
         <p>Aucune relance en attente. Beau travail.</p>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== AIDE / FAQ ===================== -->
+<div id="helpModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="glass-card modal">
+    <button id="helpClose" class="icon-btn modal-close" aria-label="Fermer">✕</button>
+    <h2 id="helpTitle">Comment ça marche ?</h2>
+    <p class="modal-sub">L'assistant lit vos e-mails des 45 derniers jours et détecte ce qui mérite une relance.</p>
+    <div class="faq">
+      <details open>
+        <summary>🔍 Comment les relances sont-elles détectées ?</summary>
+        <div class="a">L'IA analyse chaque fil de discussion où vous avez participé et distingue deux situations :
+        <br>• <span class="t1c">Tunnel 1 — En attente stricte</span> : vous avez envoyé le dernier message et il est resté <strong>sans réponse</strong>. L'IA vérifie d'abord que ce message attendait vraiment une réponse — un « Merci, bonne journée ! » ne déclenche rien.
+        <br>• <span class="t2c">Tunnel 2 — Analyse sémantique</span> : le contact <strong>a répondu</strong>, mais en lisant la conversation entière l'IA repère qu'une action reste en suspens : devis promis jamais envoyé, décision non prise, document manquant… Le mail sans réponse n'est qu'un cas particulier : l'outil détecte des <strong>missions non finalisées</strong>.</div>
+      </details>
+      <details>
+        <summary>🧠 Que lit l'IA exactement ?</summary>
+        <div class="a">Les fils des <strong>45 derniers jours</strong> (30 fils max) où vous avez écrit. Pour chaque fil, elle lit les <strong>5 derniers messages</strong> (corps inclus) et en déduit : l'action en attente, l'urgence, et le registre tu/vous que vous employez avec ce contact. Les fils déjà analysés et inchangés ne sont pas relus — c'est ce qui rend l'actualisation rapide.</div>
+      </details>
+      <details>
+        <summary>🚦 Comment l'urgence est-elle calculée ?</summary>
+        <div class="a">Par l'ancienneté du dernier message — <strong>🟠 à suivre</strong> au-delà de 7 jours, <strong>🔴 urgent</strong> au-delà de 14 — combinée à l'avis de l'IA sur l'enjeu du fil. C'est le chip « X j » sur chaque carte. Les listes sont triées par priorité.</div>
+      </details>
+      <details>
+        <summary>✏️ Pourquoi la relance me tutoie (ou vouvoie) ?</summary>
+        <div class="a">L'IA détecte le registre que <strong>vous</strong> employez avec ce contact dans le fil et l'applique à la relance : tutoiement si vous vous tutoyez, vouvoiement sinon. Le texte reste éditable, et les boutons <strong>Reformuler / Plus court / Plus formel</strong> le réécrivent en un clic.</div>
+      </details>
+      <details>
+        <summary>📤 Envoyer, brouillon : quelle différence ?</summary>
+        <div class="a"><strong>📤 Envoyer</strong> expédie la relance immédiatement, <strong>dans le fil de conversation d'origine</strong> (chez vous comme chez le destinataire), et marque l'élément traité. <strong>✉ Brouillon</strong> crée un brouillon rattaché au fil dans votre Gmail, pour relire et envoyer depuis Gmail. « Ouvrir dans Gmail ↗ » affiche la conversation complète.</div>
+      </details>
+      <details>
+        <summary>🗂 Que font Traité, Ignorer et Reporter ?</summary>
+        <div class="a"><strong>✓ Traité</strong> : l'affaire est réglée, la carte disparaît. <strong>✕ Ignorer</strong> : pas pertinent, elle ne reviendra plus. <strong>⏰ Reporter 7 j</strong> : elle réapparaîtra dans une semaine. Dans tous les cas, si le contact envoie un <strong>nouveau message</strong> dans le fil, celui-ci est automatiquement réactivé.</div>
+      </details>
+      <details>
+        <summary>☀️ C'est quoi le digest matinal ?</summary>
+        <div class="a">Chaque matin à 8h, vous recevez dans votre boîte Gmail un récapitulatif des relances en attente — seulement s'il y en a. Il s'active/se désactive avec le bouton <strong>🔔 Digest matinal</strong> du tableau de bord.</div>
+      </details>
+      <details>
+        <summary>🤔 Pourquoi tel fil n'apparaît pas ?</summary>
+        <div class="a">Plusieurs filtres écartent le bruit : expéditeurs automatiques (noreply…), newsletters, invitations d'agenda, fils de plus de 45 jours, et fils que l'IA juge clos (rien en attente). Si un fil manque à tort, le bouton <strong>↻ Actualiser</strong> relance une analyse complète.</div>
+      </details>
+      <details>
+        <summary>🔒 Et mes données ?</summary>
+        <div class="a">Chacun se connecte avec son compte Google <strong>@bleucitron.net</strong> et ne voit que sa propre boîte. Rien n'est partagé entre utilisateurs. Le serveur ne conserve qu'un cache d'analyse et vos statuts ; vos identifiants Google sont chiffrés. Les e-mails ne sont jamais stockés ailleurs ni utilisés pour autre chose que la détection.</div>
+      </details>
     </div>
   </div>
 </div>
@@ -968,6 +1059,30 @@ $('digestBtn').addEventListener('click', async function () {
   } catch (err) {
     toast('⚠ Échec, réessayez');
   }
+});
+
+/* ===================== Aide / FAQ ===================== */
+
+var helpReturnFocus = null;
+
+function openHelp() {
+  helpReturnFocus = document.activeElement;
+  $('helpModal').classList.add('show');
+  $('helpClose').focus();
+}
+function closeHelp() {
+  $('helpModal').classList.remove('show');
+  if (helpReturnFocus && helpReturnFocus.focus) helpReturnFocus.focus();
+}
+
+$('helpBtn').addEventListener('click', openHelp);
+$('helpBtnLogin').addEventListener('click', openHelp);
+$('helpClose').addEventListener('click', closeHelp);
+$('helpModal').addEventListener('click', function (e) {
+  if (e.target === this) closeHelp(); // clic sur le fond uniquement
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' && $('helpModal').classList.contains('show')) closeHelp();
 });
 
 /* ===================== Toast ===================== */
