@@ -123,7 +123,8 @@ async function searchThreads(gmail, { days, max }) {
   const q = `in:sent after:${after.getFullYear()}/${after.getMonth() + 1}/${after.getDate()}`;
 
   // Pagination : l'API renvoie 100 fils max par page, triés du plus récent
-  // au plus ancien — sans boucle, la fenêtre serait tronquée aux derniers jours
+  // au plus ancien — on va jusqu'au bout de la fenêtre, `max` n'est qu'un
+  // garde-fou (jamais une troncature silencieuse)
   const ids = [];
   let pageToken;
   do {
@@ -137,6 +138,12 @@ async function searchThreads(gmail, { days, max }) {
     pageToken = res.data.nextPageToken;
   } while (pageToken && ids.length < max);
 
+  if (pageToken) {
+    console.warn(
+      `[gmail] ⚠ fenêtre tronquée : plus de ${max} fils sur ${days} jours ` +
+        `(augmenter ANALYSIS_MAX_THREADS)`
+    );
+  }
   return ids;
 }
 

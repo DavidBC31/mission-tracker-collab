@@ -6,8 +6,10 @@ Application d'analyse d'e-mails avec détection de tâches en attente.
 - Tunnel 1 : envoyé sans réponse ET le mail attend une réponse (classification Claude) → relance
 - Tunnel 2 : réponse reçue, tâche non finalisée (classification Claude sur le corps) → relance contextuelle
 - Filtres anti-bruit : expéditeurs automatiques (noreply…), newsletters (List-Unsubscribe), invitations calendrier
-- Fenêtre : 45 jours, limite 250 fils (ANALYSIS_MAX_THREADS — recherche Gmail paginée ;
-  une limite trop basse tronquerait la fenêtre aux fils les plus récents)
+- Fenêtre : 45 jours, couverte EN ENTIER (recherche Gmail paginée). ANALYSIS_MAX_THREADS
+  (défaut 1000) n'est qu'un garde-fou — s'il tronque, un warning est loggé. Ne jamais
+  remettre une petite limite : Gmail trie du plus récent au plus ancien, elle réduirait
+  la fenêtre aux derniers jours (bug historique)
 - Urgence : max(HIGH > 14j / MEDIUM > 7j / NORMAL, avis Claude) — recalculée à chaque affichage
 - Registre tu/vous détecté dans le fil et reflété dans la relance
 - Statuts par fil : traité / ignoré / reporté (snooze) — réactivé si nouveau message dans le fil

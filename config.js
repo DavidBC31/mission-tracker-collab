@@ -43,10 +43,11 @@ const config = {
   // Paramètres métier d'analyse
   analysis: {
     DAYS_WINDOW: 45,
-    // Assez large pour couvrir réellement la fenêtre (le cache par fil rend
-    // les analyses répétées quasi gratuites) ; les fils sont triés du plus
-    // récent au plus ancien par Gmail, une limite trop basse tronque la fenêtre
-    MAX_THREADS: parseInt(process.env.ANALYSIS_MAX_THREADS || '250', 10),
+    // Plafond de sécurité, pas une limite fonctionnelle : la fenêtre de 45 jours
+    // doit être couverte EN ENTIER (Gmail trie du plus récent au plus ancien,
+    // un plafond trop bas la tronquerait). S'il est atteint, un warning est loggé.
+    // Le cache par fil rend les analyses répétées quasi gratuites.
+    MAX_THREADS: parseInt(process.env.ANALYSIS_MAX_THREADS || '1000', 10),
     URGENCY_HIGH_DAYS: 14,
     URGENCY_MED_DAYS: 7,
     CACHE_TTL_MS: 5 * 60 * 1000, // 5 minutes par utilisateur
