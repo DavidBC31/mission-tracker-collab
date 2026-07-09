@@ -122,13 +122,22 @@ async function searchThreads(gmail, { days, max }) {
   const after = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
   const q = `in:sent after:${after.getFullYear()}/${after.getMonth() + 1}/${after.getDate()}`;
 
-  const res = await gmail.users.threads.list({
-    userId: 'me',
-    q,
-    maxResults: max,
-  });
+  // Pagination : l'API renvoie 100 fils max par page, triés du plus récent
+  // au plus ancien — sans boucle, la fenêtre serait tronquée aux derniers jours
+  const ids = [];
+  let pageToken;
+  do {
+    const res = await gmail.users.threads.list({
+      userId: 'me',
+      q,
+      maxResults: Math.min(100, max - ids.length),
+      pageToken,
+    });
+    for (const t of res.data.threads || []) ids.push(t.id);
+    pageToken = res.data.nextPageToken;
+  } while (pageToken && ids.length < max);
 
-  return (res.data.threads || []).map((t) => t.id);
+  return ids;
 }
 
 function normalizeMessage(m, withBody) {

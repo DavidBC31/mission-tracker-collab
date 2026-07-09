@@ -26,3 +26,6 @@ Thumbs.db
 # Cloudflare
 *.pem
 .cloudflared/
+
+# Projet frère : La Machine (dépôt git séparé)
+outil-booking/
